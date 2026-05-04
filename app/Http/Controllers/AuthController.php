@@ -28,9 +28,9 @@ class AuthController extends Controller
             ]);
         }
 
-        return redirect()->to(
-            $this->authService->redirectByRole()
-        );
+        session(['login_success' => true]);
+
+        return redirect()->route('splash');
     }
 
     public function logout(Request $request)

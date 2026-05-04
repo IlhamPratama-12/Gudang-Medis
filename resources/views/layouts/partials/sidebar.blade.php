@@ -5,8 +5,8 @@
     {{-- LOGO + TOGGLE --}}
     <div class="h-[60px] flex items-center justify-between px-4 border-b border-gray-700">
         <div class="flex items-center gap-2">
-            <img src="{{ asset('logo/intel amfibi.png') }}"
-                 class="w-8 h-8 rounded">
+            <img src="{{ asset('image/logo/logo_rsud_rt_notopuro.png') }}"
+                class="w-8 h-8 rounded">
             <span class="sidebar-text font-bold text-lg">SIMAK</span>
         </div>
 
@@ -19,6 +19,7 @@
     {{-- MENU --}}
     <nav class="flex-1 px-3 py-4 space-y-6 text-sm">
 
+        {{-- ================= ADMIN ================= --}}
         @role('admin')
         <div>
             <p class="sidebar-text text-xs text-gray-400 mb-2">ADMIN</p>
@@ -36,55 +37,89 @@
                     <span class="sidebar-text">User Approval</span>
                 </a>
 
-                <a href="#"
-                   class="menu-item">
-                    <i class="bi bi-gear"></i>
-                    <span class="sidebar-text">Settings</span>
-                </a>
-
             </ul>
         </div>
         @endrole
 
+
+        {{-- ================= MANAJEMEN ================= --}}
         @hasanyrole('manajemen|admin')
         <div>
-            <p class="sidebar-text text-xs text-gray-400 mb-2">MANAJEMEN</p>
+            <p class="sidebar-text text-xs text-gray-400 mb-2">MANAJEMEN GUDANG</p>
+
             <ul class="space-y-1">
-                <a href="#" class="menu-item">
+
+                <a href="#"
+                   class="menu-item">
+                    <i class="bi bi-grid-1x2"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+
+                <a href="#"
+                   class="menu-item">
+                    <i class="bi bi-box-arrow-in-down"></i>
+                    <span class="sidebar-text">Laporan Barang Masuk</span>
+                </a>
+
+                <a href="#"
+                   class="menu-item">
+                    <i class="bi bi-box-arrow-up"></i>
+                    <span class="sidebar-text">Laporan Barang Keluar</span>
+                </a>
+
+                <a href="#"
+                   class="menu-item">
                     <i class="bi bi-box-seam"></i>
-                    <span class="sidebar-text">Mlis 1</span>
+                    <span class="sidebar-text">Laporan Stok</span>
                 </a>
-                <a href="#" class="menu-item">
-                    <i class="bi bi-clipboard-data"></i>
-                    <span class="sidebar-text">Mlis 2</span>
+
+                {{-- peramalan --}}
+                <a href="#"
+                   class="menu-item bg-blue-600 hover:bg-blue-700">
+                    <i class="bi bi-graph-up"></i>
+                    <span class="sidebar-text">Forecasting Kebutuhan</span>
                 </a>
-                <a href="#" class="menu-item">
-                    <i class="bi bi-journal-text"></i>
-                    <span class="sidebar-text">Mlis 3</span>
+
+                <a href="#"
+                   class="menu-item">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span class="sidebar-text">Monitoring Stok</span>
                 </a>
+
             </ul>
         </div>
         @endhasanyrole
 
+
+        {{-- ================= PETUGAS ================= --}}
         @hasanyrole('petugas|admin')
         <div>
-            <p class="sidebar-text text-xs text-gray-400 mb-2">PETUGAS</p>
+            <p class="sidebar-text text-xs text-gray-400 mb-2">PETUGAS GUDANG</p>
+
             <ul class="space-y-1">
-                <a href="#" class="menu-item">
-                    <i class="bi bi-truck"></i>
-                    <span class="sidebar-text">Glis 1</span>
-                </a>
-                <a href="#" class="menu-item">
+
+                <a href="{{ route('petugas.gudang') }}"
+                   class="menu-item {{ request()->routeIs('petugas.gudang') ? 'bg-gray-700' : '' }}">
                     <i class="bi bi-box"></i>
-                    <span class="sidebar-text">Glis 2</span>
+                    <span class="sidebar-text">Data Alat Medis</span>
                 </a>
-                <a href="#" class="menu-item">
-                    <i class="bi bi-check2-circle"></i>
-                    <span class="sidebar-text">Glis 3</span>
+
+                <a href="{{ route('stok.masuk') }}"
+                class="menu-item">
+                    <i class="bi bi-box-arrow-in-down"></i>
+                    <span class="sidebar-text">Barang Masuk</span>
                 </a>
+
+                <a href="{{ route('stok.keluar') }}"
+                   class="menu-item">
+                    <i class="bi bi-box-arrow-up"></i>
+                    <span class="sidebar-text">Barang Keluar</span>
+                </a>
+
             </ul>
         </div>
         @endhasanyrole
+
     </nav>
 
     {{-- LOGOUT --}}
@@ -97,4 +132,5 @@
             <span class="sidebar-text">Logout</span>
         </button>
     </form>
+
 </aside>

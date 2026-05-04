@@ -8,14 +8,14 @@
 </head>
 
 <body class="h-screen bg-cover bg-center flex items-center justify-center"
-      style="background-image: url('{{ asset('bg/bglogin.png') }}');">
+      style="background-image: url('{{ asset('image/background/RSUD_bg.jpeg') }}');">
 
 <div class="bg-white/80 backdrop-blur-md shadow-xl rounded-2xl w-[400px] p-8">
 
     <!-- LOGO -->
     <div class="flex justify-center mb-6">
-        <img src="{{ asset('logo/intel amfibi.png') }}"
-             class="h-16 w-16 rounded-full shadow-md">
+        <img src="{{ asset('image/logo/logo_rsud_rt_notopuro.png') }}"
+            class="w-8 h-8 rounded">
     </div>
 
     <h2 class="text-center text-2xl font-bold text-gray-900">
