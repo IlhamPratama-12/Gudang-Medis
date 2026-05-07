@@ -11,6 +11,10 @@ use App\Http\Controllers\Petugas\AlatMedisController;
 use App\Http\Controllers\Petugas\StokMasukController;
 use App\Http\Controllers\Petugas\StokKeluarController;
 
+use App\Http\Controllers\manajemen\LaporanMasukController;
+use App\Http\Controllers\manajemen\LaporanKeluarController;
+use App\Http\Controllers\manajemen\DashboardManajemenController;
+
 /*
 |--------------------------------------------------------------------------
 | ROOT
@@ -43,7 +47,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD (AUTO REDIRECT BY ROLE)
+| DASHBOARD
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->get('/dashboard', function () {
@@ -53,15 +57,16 @@ Route::middleware('auth')->get('/dashboard', function () {
     if ($user->status !== 'approved') {
         Auth::logout();
 
-        return redirect()->route('login.form')
+        return redirect()
+            ->route('login.form')
             ->withErrors(['email' => 'Akun kamu masih menunggu persetujuan admin']);
     }
 
     return match ($user->role) {
-        'admin'     => view('dashboard.admin.index'),
+        'admin' => view('dashboard.admin.index'),
         'manajemen' => view('dashboard.manajemen.index'),
-        'petugas'   => view('dashboard.petugas.index'),
-        default     => abort(403),
+        'petugas' => view('dashboard.petugas.index'),
+        default => abort(403),
     };
 
 })->name('dashboard');
@@ -82,14 +87,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| PETUGAS + ADMIN (OPERASIONAL GUDANG)
+| PETUGAS + ADMIN (GUDANG)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin,petugas'])->group(function () {
 
-    // ALAT MEDIS
     Route::get('/petugas-gudang', [AlatMedisController::class, 'index'])
         ->name('petugas.gudang');
+
+    Route::get('/petugas-gudang/detail', [AlatMedisController::class, 'detail'])
+        ->name('petugas.gudang.detail');
 
     Route::get('/alat-medis/create', [AlatMedisController::class, 'create'])
         ->name('alat.create');
@@ -106,7 +113,6 @@ Route::middleware(['auth', 'role:admin,petugas'])->group(function () {
     Route::delete('/alat-medis/{id}', [AlatMedisController::class, 'destroy'])
         ->name('alat.destroy');
 
-    // STOK MASUK
     Route::get('/stok-masuk', [StokMasukController::class, 'index'])
         ->name('stok.masuk');
 
@@ -116,7 +122,7 @@ Route::middleware(['auth', 'role:admin,petugas'])->group(function () {
     Route::post('/stok-masuk', [StokMasukController::class, 'store'])
         ->name('stok.masuk.store');
 
-        Route::get('/stok-keluar', [StokKeluarController::class, 'index'])
+    Route::get('/stok-keluar', [StokKeluarController::class, 'index'])
         ->name('stok.keluar');
 
     Route::get('/stok-keluar/create', [StokKeluarController::class, 'create'])
@@ -128,36 +134,49 @@ Route::middleware(['auth', 'role:admin,petugas'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| MANAJEMEN (UNTUK LAPORAN + FORECASTING)
+| MANAJEMEN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:manajemen'])->group(function () {
+Route::middleware(['auth', 'role:manajemen,admin'])->group(function () {
 
-    Route::get('/manajemen/dashboard', function () {
-        return view('dashboard.manajemen.index');
-    })->name('manajemen.dashboard');
+    Route::get('/manajemen/dashboard', [DashboardManajemenController::class, 'index'])
+        ->name('manajemen.dashboard');
 
-    Route::get('/laporan/stok', function () {
-        return view('dashboard.manajemen.laporan_stok');
-    })->name('laporan.stok');
+    /*
+    |------------------------
+    | LAPORAN STOK MASUK
+    |------------------------
+    */
+    Route::get('/laporan/stok-masuk', [LaporanMasukController::class, 'index'])
+        ->name('laporan.stok.masuk');
+
+    Route::get('/laporan/stok-keluar', [LaporanKeluarController::class, 'index'])
+    ->name('laporan.stok.keluar');
 
     Route::get('/forecasting', function () {
         return view('dashboard.manajemen.forecasting');
     })->name('forecasting.index');
+
+
 });
 
+/*
+|--------------------------------------------------------------------------
+| SPLASH SCREEN
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->get('/splash', function () {
 
-        if (!session('login_success')) {
-            return redirect()->route('dashboard');
-        }
+    if (!session('login_success')) {
+        return redirect()->route('dashboard');
+    }
 
-        session()->forget('login_success');
+    session()->forget('login_success');
 
-        $user = Auth::user();
+    $user = Auth::user();
 
-        return view('splash', [
-            'role' => $user->role
-        ]);
+    return view('splash', [
+        'role' => $user->role
+    ]);
 
-    })->name('splash');
+})->name('splash');

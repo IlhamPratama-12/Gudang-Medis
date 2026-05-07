@@ -4,34 +4,57 @@ namespace App\Http\Controllers\petugas;
 
 use App\Http\Controllers\Controller;
 use App\Models\AlatMedis;
+use App\Models\RekapGudang;
 use Illuminate\Http\Request;
 
 class AlatMedisController extends Controller
 {
     public function index(Request $request)
     {
-        // $alatMedis = AlatMedis::query()
+        $query = RekapGudang::query();
 
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_alat_medis', 'like', "%{$request->search}%")
+                  ->orWhere('kode_asal', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        if ($request->filled('status_stok')) {
+            $query->where('status_stok', $request->status_stok);
+        }
+
+        $alatMedis = $query->orderBy('kode_asal', 'asc')->get();
+
+        return view('dashboard.petugas_gudang.index', compact('alatMedis'));
+    }
+
+    public function detail(Request $request)
+    {
         $query = AlatMedis::query();
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_alat', 'like', '%' . $request->search . '%')
-                ->orWhere('kode_barang', 'like', '%' . $request->search . '%');
+                $q->where('nama_alat_medis', 'like', "%{$request->search}%")
+                  ->orWhere('kode_barang', 'like', "%{$request->search}%");
             });
         }
 
-        if ($request->filled('jenis_barang')) {
-            $query->where('jenis_barang', $request->jenis_barang);
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($request->filled('status_stok')) {
+            $query->where('status_stok', $request->status_stok);
         }
 
-        $alatMedis = $query->orderBy('id', 'desc')->get();
+        $alatMedis = $query->orderBy('kode_barang', 'asc')->get();
 
-        return view('dashboard.petugas_gudang.index', compact('alatMedis'));
+        return view('dashboard.petugas_gudang.detail_supplier', compact('alatMedis'));
     }
 
     public function create()
@@ -42,61 +65,66 @@ class AlatMedisController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_alat' => 'required',
-            'jenis_barang' => 'required',
-            'satuan' => 'required',
-            'stok' => 'required|integer',
-            'safety_stock' => 'required|integer',
+            'nama_alat_medis' => 'required',
+            'jenis'           => 'required',
+            'satuan'          => 'required',
         ]);
 
-        // AUTO KODE
-        if ($request->jenis_barang == 'Konsumable') {
-            $last = AlatMedis::where('kode_barang', 'LIKE', 'K%')
-                ->orderByDesc('kode_barang')
+        if ($request->jenis == 'Konsumable') {
+
+            $last = RekapGudang::where('kode_asal', 'LIKE', 'K%')
+                ->orderBy('kode_asal', 'desc')
                 ->first();
 
-            $number = $last ? (int)substr($last->kode_barang, 1) + 1 : 1;
+            $number = $last ? (int) substr($last->kode_asal, 1) + 1 : 1;
+
             $kode = 'K' . str_pad($number, 3, '0', STR_PAD_LEFT);
+
         } else {
-            $last = AlatMedis::where('kode_barang', 'LIKE', 'NK%')
-                ->orderByDesc('kode_barang')
+
+            $last = RekapGudang::where('kode_asal', 'LIKE', 'NK%')
+                ->orderBy('kode_asal', 'desc')
                 ->first();
 
-            $number = $last ? (int)substr($last->kode_barang, 2) + 1 : 1;
+            $number = $last ? (int) substr($last->kode_asal, 2) + 1 : 1;
+
             $kode = 'NK' . str_pad($number, 3, '0', STR_PAD_LEFT);
         }
 
-        AlatMedis::create([
-            'kode_barang' => $kode,
-            'nama_alat' => $request->nama_alat,
-            'jenis_barang' => $request->jenis_barang,
-            'satuan' => $request->satuan,
-            'stok' => $request->stok,
-            'safety_stock' => $request->safety_stock,
-            'status' => 'Baik',
+        RekapGudang::create([
+            'kode_asal'       => $kode,
+            'nama_alat_medis' => $request->nama_alat_medis,
+            'jenis'           => $request->jenis,
+            'satuan'          => $request->satuan,
+
+            'total_stok'      => 0,
+            'jumlah_supplier' => 0,
+
+            'avg_pemakaian'   => 0,
+            'safety_stock'    => 0,
+
+            'status_stok'     => 'Aman',
         ]);
 
         return redirect()->route('petugas.gudang')
-            ->with('success', 'Data berhasil ditambahkan');
+            ->with('success', 'Data alat medis berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        $alat = AlatMedis::findOrFail($id);
+        $alat = RekapGudang::findOrFail($id);
         return view('dashboard.petugas_gudang.edit', compact('alat'));
     }
 
     public function update(Request $request, $id)
     {
-        $alat = AlatMedis::findOrFail($id);
+        $alat = RekapGudang::findOrFail($id);
 
         $alat->update([
-            'nama_alat' => $request->nama_alat,
-            'jenis_barang' => $request->jenis_barang,
-            'satuan' => $request->satuan,
-            'stok' => $request->stok,
-            'safety_stock' => $request->safety_stock,
-            'status' => $request->status ?? 'Baik',
+            'nama_alat_medis' => $request->nama_alat_medis,
+            'jenis'           => $request->jenis,
+            'satuan'          => $request->satuan,
+            'status_stok'     => $request->status_stok ?? 'Aman',
         ]);
 
         return redirect()->route('petugas.gudang')
@@ -105,7 +133,7 @@ class AlatMedisController extends Controller
 
     public function destroy($id)
     {
-        AlatMedis::findOrFail($id)->delete();
+        RekapGudang::findOrFail($id)->delete();
 
         return redirect()->route('petugas.gudang')
             ->with('success', 'Data berhasil dihapus');

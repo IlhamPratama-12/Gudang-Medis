@@ -55,16 +55,69 @@
         <table class="w-full text-sm">
 
             <thead class="bg-gray-50 text-gray-700 uppercase text-xs tracking-wider">
-                <tr>
-                    <th class="px-4 py-3 text-left">No</th>
-                    <th class="px-4 py-3 text-left">Nama</th>
-                    <th class="px-4 py-3 text-left">Kode</th>
-                    <th class="px-4 py-3 text-left">Jenis</th>
-                    <th class="px-4 py-3 text-left">Stok</th>
-                    <th class="px-4 py-3 text-left">Satuan</th>
-                    <th class="px-4 py-3 text-left">Status</th>
-                    <th class="px-4 py-3 text-left">Aksi</th>
+                <tbody id="tableBody" class="divide-y divide-gray-100">
+
+                @forelse($alatMedis as $i => $alat)
+
+                <tr class="hover:bg-gray-50 transition">
+
+                    <td class="px-4 py-3">
+                        {{ $i + 1 }}
+                    </td>
+
+                    <td class="px-4 py-3 kode">
+                        {{ $alat->kode_asal }}
+                    </td>
+
+                    <td class="px-4 py-3 nama font-medium">
+                        {{ $alat->nama_alat_medis }}
+                    </td>
+
+                    <td class="px-4 py-3 jenis">
+                        {{ $alat->jenis }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                            {{ $alat->total_stok }}
+                        </span>
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $alat->jumlah_supplier }} Supplier
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $alat->satuan }}
+                    </td>
+
+                    <td class="px-4 py-3">
+
+                        <a href="{{ route('petugas.gudang.detail', $alat->kode_asal) }}"
+                            class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-xs">
+
+                            Detail Supplier
+
+                        </a>
+
+                    </td>
+
                 </tr>
+
+                @empty
+
+                <tr>
+                    <td colspan="8"
+                        class="text-center py-10 text-gray-400">
+
+                        Tidak ada data
+
+                    </td>
+                </tr>
+
+                @endforelse
+
+                </tbody>
             </thead>
 
             <tbody id="tableBody" class="divide-y divide-gray-100">
@@ -73,67 +126,56 @@
                 <tr class="hover:bg-gray-50 transition">
 
                     <td class="px-4 py-3">{{ $i + 1 }}</td>
-
-                    <td class="px-4 py-3 font-medium text-gray-800 nama">
-                        {{ $alat->nama_alat }}
-                    </td>
-
+                    
                     <td class="px-4 py-3 kode text-gray-600">
                         {{ $alat->kode_barang }}
                     </td>
 
+                    <td class="px-4 py-3 font-medium text-gray-800 nama">
+                        {{ $alat->nama_alat_medis }}
+                    </td>
+
                     <td class="px-4 py-3 jenis">
-                        {{ $alat->jenis_barang }}
+                        {{ $alat->jenis }}
                     </td>
 
                     <td class="px-4 py-3">
-                        {{ $alat->stok }}
+                        {{ $alat->saldo_stok }}
                     </td>
 
                     <td class="px-4 py-3 text-gray-600">
                         {{ $alat->satuan }}
                     </td>
 
+                    
                     {{-- STATUS BADGE --}}
                     <td class="px-4 py-3 status">
                         @php
                             $status = strtolower($alat->status);
-                        @endphp
+                            @endphp
 
-                        <span class="px-2 py-1 text-xs rounded-full font-medium
+                            <span class="px-2 py-1 text-xs rounded-full font-medium
                             @if($status == 'baik') bg-green-100 text-green-700
                             @elseif($status == 'rusak') bg-red-100 text-red-700
                             @elseif($status == 'maintenance') bg-yellow-100 text-yellow-700
                             @elseif($status == 'expired') bg-gray-200 text-gray-700
                             @else bg-blue-100 text-blue-700
                             @endif
-                        ">
-                            {{ $alat->status }}
-                        </span>
+                            ">
+                            {{ $alat->status_stok }}
+                            </span>
+                            </td>
+
+
+                    <td class="px-4 py-3">
+                        {{ $alat->nama_supplier }}
                     </td>
 
                     <td class="px-4 py-3">
-                        <div class="flex gap-2">
-
-                            <a href="{{ route('alat.edit', $alat->id) }}"
-                               class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs">
-                                Edit
-                            </a>
-
-                            <form action="{{ route('alat.destroy', $alat->id) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('Hapus data ini?')">
-
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs">
-                                    Hapus
-                                </button>
-
-                            </form>
-
-                        </div>
+                        <a href="{{ route('petugas.gudang.detail') }}"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs">
+                            Detail
+                        </a>
                     </td>
 
                 </tr>

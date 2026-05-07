@@ -17,49 +17,42 @@
 
 <div class="bg-white rounded-xl shadow p-5">
 
-    {{-- FILTER --}}
-    <form method="GET" class="flex flex-wrap gap-3 mb-5">
+    {{-- FILTER (SUDAH FULL LARAVEL) --}}
+    <form method="GET" class="flex flex-wrap gap-3 mb-5 items-center">
 
-        {{-- SEARCH --}}
         <input type="text"
             name="search"
             value="{{ request('search') }}"
             placeholder="Cari nama / kode barang..."
-            class="border px-3 py-2 rounded-lg text-sm w-72 focus:ring focus:outline-none">
+            class="border px-3 py-2 rounded-lg text-sm w-72">
 
-        {{-- BULAN --}}
         <select name="bulan" class="border px-3 py-2 rounded-lg text-sm">
             <option value="">Semua Bulan</option>
-            <option value="1" {{ request('bulan') == 1 ? 'selected' : '' }}>Januari</option>
-            <option value="2" {{ request('bulan') == 2 ? 'selected' : '' }}>Februari</option>
-            <option value="3" {{ request('bulan') == 3 ? 'selected' : '' }}>Maret</option>
-            <option value="4" {{ request('bulan') == 4 ? 'selected' : '' }}>April</option>
-            <option value="5" {{ request('bulan') == 5 ? 'selected' : '' }}>Mei</option>
-            <option value="6" {{ request('bulan') == 6 ? 'selected' : '' }}>Juni</option>
-            <option value="7" {{ request('bulan') == 7 ? 'selected' : '' }}>Juli</option>
-            <option value="8" {{ request('bulan') == 8 ? 'selected' : '' }}>Agustus</option>
-            <option value="9" {{ request('bulan') == 9 ? 'selected' : '' }}>September</option>
-            <option value="10" {{ request('bulan') == 10 ? 'selected' : '' }}>Oktober</option>
-            <option value="11" {{ request('bulan') == 11 ? 'selected' : '' }}>November</option>
-            <option value="12" {{ request('bulan') == 12 ? 'selected' : '' }}>Desember</option>
+            @for($i=1;$i<=12;$i++)
+                <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
+                    {{ DateTime::createFromFormat('!m', $i)->format('F') }}
+                </option>
+            @endfor
         </select>
 
-        {{-- TAHUN --}}
         <input type="number"
             name="tahun"
             value="{{ request('tahun') }}"
             placeholder="Tahun"
             class="border px-3 py-2 rounded-lg text-sm w-32">
 
-        {{-- BUTTON FILTER --}}
-        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-            Cari
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
+            Filter
         </button>
 
-        {{-- RESET --}}
         <a href="{{ route('stok.masuk') }}"
-           class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">
+           class="bg-gray-200 px-4 py-2 rounded-lg text-sm">
             Reset
+        </a>
+
+        <a href="{{ route('stok.masuk.create') }}"
+           class="ml-auto bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
+            + Tambah
         </a>
 
     </form>
@@ -67,46 +60,51 @@
     {{-- TABLE --}}
     <div class="overflow-x-auto">
 
-        <table class="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+        <table class="w-full text-sm">
 
-            <thead class="bg-gray-100 text-gray-700">
+            <thead class="bg-gray-100">
                 <tr>
-                    <th class="px-4 py-3 text-left">No</th>
-                    <th class="px-4 py-3 text-left">Kode</th>
-                    <th class="px-4 py-3 text-left">Nama Alat</th>
-                    <th class="px-4 py-3 text-left">Kategori</th>
-                    <th class="px-4 py-3 text-left">Jenis</th>
-                    <th class="px-4 py-3 text-left">Tanggal Masuk</th>
-                    <th class="px-4 py-3 text-left">Jumlah</th>
-                    <th class="px-4 py-3 text-left">Satuan</th>
-                    <th class="px-4 py-3 text-left">Supplier</th>
+                    <th class="px-4 py-3">No</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Kategori</th>
+                    <th>Jenis</th>
+                    <th>Tanggal</th>
+                    <th>Jumlah</th>
+                    <th>Satuan</th>
+                    <th>Supplier</th>
                 </tr>
             </thead>
 
-            <tbody class="text-gray-700">
+            <tbody>
 
-                @forelse($stokMasuk as $i => $item)
-                <tr class="border-t hover:bg-gray-50">
+                @forelse($stokMasuk as $item)
 
-                    <td class="px-4 py-3">{{ $i + 1 }}</td>
-                    <td class="px-4 py-3 font-medium">{{ $item->kode_barang }}</td>
-                    <td class="px-4 py-3">{{ $item->nama_alat_medis }}</td>
-                    <td class="px-4 py-3">{{ $item->kategori }}</td>
-                    <td class="px-4 py-3">{{ $item->jenis }}</td>
-                    <td class="px-4 py-3">{{ $item->tanggal_masuk }}</td>
-                    <td class="px-4 py-3">
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
-                            {{ $item->jumlah_masuk }}
-                        </span>
+                <tr class="border-b hover:bg-gray-50">
+
+                    <td class="px-4 py-2">
+                        {{ $loop->iteration + ($stokMasuk->currentPage()-1)*$stokMasuk->perPage() }}
                     </td>
-                    <td class="px-4 py-3">{{ $item->satuan }}</td>
-                    <td class="px-4 py-3">{{ $item->supplier_vendor }}</td>
+
+                    <td class="px-4 py-2">{{ $item->kode_barang }}</td>
+                    <td class="px-4 py-2">{{ $item->nama_alat_medis }}</td>
+                    <td class="px-4 py-2">{{ $item->kategori }}</td>
+                    <td class="px-4 py-2">{{ $item->jenis }}</td>
+                    <td class="px-4 py-2">{{ $item->tanggal_masuk }}</td>
+
+                    <td class="px-4 py-2 text-blue-600 font-semibold">
+                        {{ $item->jumlah_masuk }}
+                    </td>
+
+                    <td class="px-4 py-2">{{ $item->satuan }}</td>
+                    <td class="px-4 py-2">{{ $item->supplier_vendor }}</td>
 
                 </tr>
+
                 @empty
                 <tr>
                     <td colspan="9" class="text-center py-6 text-gray-500">
-                        Tidak ada data stok masuk
+                        Tidak ada data
                     </td>
                 </tr>
                 @endforelse
@@ -116,6 +114,12 @@
         </table>
 
     </div>
+
+    {{-- PAGINATION --}}
+    <div class="mt-4">
+        {{ $stokMasuk->links() }}
+    </div>
+
 </div>
 
 @endsection

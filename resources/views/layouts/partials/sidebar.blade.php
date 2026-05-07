@@ -49,33 +49,27 @@
 
             <ul class="space-y-1">
 
-                <a href="#"
+                <a href="{{ route('manajemen.dashboard') }}"
                    class="menu-item">
                     <i class="bi bi-grid-1x2"></i>
                     <span class="sidebar-text">Dashboard</span>
                 </a>
 
-                <a href="#"
+                <a href="{{ route('laporan.stok.masuk') }}"
                    class="menu-item">
                     <i class="bi bi-box-arrow-in-down"></i>
                     <span class="sidebar-text">Laporan Barang Masuk</span>
                 </a>
 
-                <a href="#"
+                <a href="{{ route('laporan.stok.keluar') }}"
                    class="menu-item">
                     <i class="bi bi-box-arrow-up"></i>
                     <span class="sidebar-text">Laporan Barang Keluar</span>
                 </a>
 
-                <a href="#"
-                   class="menu-item">
-                    <i class="bi bi-box-seam"></i>
-                    <span class="sidebar-text">Laporan Stok</span>
-                </a>
-
                 {{-- peramalan --}}
                 <a href="#"
-                   class="menu-item bg-blue-600 hover:bg-blue-700">
+                   class="menu-item">
                     <i class="bi bi-graph-up"></i>
                     <span class="sidebar-text">Forecasting Kebutuhan</span>
                 </a>

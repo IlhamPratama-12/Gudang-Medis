@@ -8,8 +8,9 @@ class StokKeluar extends Model
 {
     protected $table = 'stok_keluar';
 
+    public $timestamps = false;
+
     protected $fillable = [
-        'no',
         'kode_barang',
         'nama_alat_medis',
         'kategori',

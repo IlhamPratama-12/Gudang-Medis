@@ -8,11 +8,11 @@ class StokMasuk extends Model
 {
     protected $table = 'stok_masuk';
 
+    public $timestamps = false; 
+
     protected $fillable = [
-        'no',
         'kode_barang',
         'nama_alat_medis',
-        'kategori',
         'jenis',
         'tanggal_masuk',
         'bulan',
